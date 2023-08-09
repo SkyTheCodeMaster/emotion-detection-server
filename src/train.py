@@ -8,6 +8,7 @@ import model
 from make_token import tokenize
 import csv
 import numpy as np
+from random import shuffle
 
 data_path = "./emotion_weights.pth"
 
@@ -46,6 +47,8 @@ if RETRAIN:
 
   print("Start training")
   try:
+    print("Shuffling trainset")
+    shuffle(trainset)
     epoch = 0
     while True:
       epoch += 1
@@ -68,7 +71,7 @@ if RETRAIN:
 
         running_loss += loss.item()
         if i % 2000 == 1999:
-            print(f"[{epoch + 1}, {i+1:5d}] loss: {running_loss / 2000:.3f}")
+            print(f"[{epoch}, {i+1:5d}] loss: {running_loss / 2000:.3f}")
             running_loss = 0.0
       # save the dataset incase power goes out or something
       torch.save(net.state_dict(),data_path)

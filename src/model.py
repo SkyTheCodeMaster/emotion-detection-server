@@ -10,9 +10,11 @@ class Network(nn.Module):
   def __init__(self, *args, **kwargs) -> None:
     super().__init__(*args, **kwargs)
     self.linear_relu_stack = nn.Sequential(
-      nn.Linear(40,20), # 40 input tokens, whittle it down to 13 neurons
+      nn.Linear(40,30), # 40 input tokens, whittle it down to 13 neurons
       nn.ReLU(),
-      nn.Linear(20,20),
+      nn.Linear(30,25),
+      nn.ReLU(),
+      nn.Linear(25,20),
       nn.ReLU(),
       nn.Linear(20,1) # 1 output neurons, 1 for each class.
     )
