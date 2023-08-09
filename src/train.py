@@ -54,7 +54,7 @@ if RETRAIN:
       for i,data in enumerate(trainset):
         # collect the data
         label, inputs = data
-        tlabel = torch.Tensor([CLASSES[label]], device=device)
+        tlabel = torch.tensor([CLASSES[label]], device=device)
         in_array = tokenize(inputs)
         np_array = np.array(in_array).astype(np.double)
         tin = torch.from_numpy(np_array)
@@ -78,7 +78,7 @@ if RETRAIN:
       
       for data in testset:
         label, text = data
-        tlabel = torch.Tensor([CLASSES[label]], device=device)
+        tlabel = torch.tensor([CLASSES[label]], device=device)
         in_array = tokenize(text)
         np_array = np.array(in_array).astype(np.double)
         tin = torch.from_numpy(np_array)
@@ -108,7 +108,7 @@ correct = 0
 
 for data in testset:
   label, text = data
-  tlabel = torch.Tensor([CLASSES[label]], device=device)
+  tlabel = torch.tensor([CLASSES[label]], device=device)
   in_array = tokenize(text)
   np_array = np.array(in_array).astype(np.double)
   tin = torch.from_numpy(np_array)
