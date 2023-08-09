@@ -57,7 +57,7 @@ if RETRAIN:
         tlabel = torch.tensor([CLASSES[label]], device=device)
         in_array = tokenize(inputs)
         np_array = np.array(in_array).astype(np.double)
-        tin = torch.from_numpy(np_array)
+        tin = torch.from_numpy(np_array).to(device)
 
         optimizer.zero_grad()
         outputs = net(tin)
@@ -81,7 +81,7 @@ if RETRAIN:
         tlabel = torch.tensor([CLASSES[label]], device=device)
         in_array = tokenize(text)
         np_array = np.array(in_array).astype(np.double)
-        tin = torch.from_numpy(np_array)
+        tin = torch.from_numpy(np_array).to(device)
         outputs = net(tin)
         prediction = torch.round(outputs)
         total += 1
@@ -111,7 +111,7 @@ for data in testset:
   tlabel = torch.tensor([CLASSES[label]], device=device)
   in_array = tokenize(text)
   np_array = np.array(in_array).astype(np.double)
-  tin = torch.from_numpy(np_array)
+  tin = torch.from_numpy(np_array).to(device)
   outputs = net(tin)
   prediction = torch.round(outputs)
   total += 1
