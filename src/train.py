@@ -19,13 +19,21 @@ net = model.Network()
 net.to(device)
 net = net.double()
 
-dataset: list[tuple[str,str]] = []
+trainset: list[tuple[str,str]] = []
 
 # Load the dataset
 with open("trainset.csv", newline="") as f:
   creader = csv.reader(f, delimiter=",")
   for row in creader:
-    dataset.append(row)
+    trainset.append(row)
+
+testset: list[tuple[str,str]] = []
+
+# Load the dataset
+with open("testset.csv", newline="") as f:
+  creader = csv.reader(f, delimiter=",")
+  for row in creader:
+    testset.append(row)
 
 
 CLASSES = {'empty': 1, 'sadness': 2, 'boredom': 3, 'anger': 4, 'relief': 5, 'fun': 6, 'surprise': 7, 'happiness': 8, 'hate': 9, 'love': 10, 'worry': 11, 'enthusiasm': 12, 'neutral': 13}
@@ -38,10 +46,12 @@ if RETRAIN:
 
   print("Start training")
   try:
-    for epoch in range(500):
+    epoch = 0
+    while True:
+      epoch += 1
       print("epoch #", epoch)
       running_loss = 0.0
-      for i,data in enumerate(dataset):
+      for i,data in enumerate(trainset):
         # collect the data
         label, inputs = data
         tlabel = torch.Tensor([CLASSES[label]], device=device)
@@ -60,6 +70,29 @@ if RETRAIN:
         if i % 2000 == 1999:
             print(f"[{epoch + 1}, {i+1:5d}] loss: {running_loss / 2000:.3f}")
             running_loss = 0.0
+      # save the dataset incase power goes out or something
+      torch.save(net.state_dict(),data_path)
+      # also do an accuracy test. if accuracy is >90%, finish.
+      total = 0
+      correct = 0
+      
+      for data in testset:
+        label, text = data
+        tlabel = torch.Tensor([CLASSES[label]], device=device)
+        in_array = tokenize(text)
+        np_array = np.array(in_array).astype(np.double)
+        tin = torch.from_numpy(np_array)
+        outputs = net(tin)
+        prediction = torch.round(outputs)
+        total += 1
+        correct += (1 if prediction == tlabel else 0)
+
+      print(f"epoch #{epoch} accuracy: {(correct / total)*100:.2f}%")
+      if (correct / total) > 0.95:
+        print(">95% accuracy achieved, exiting")
+        torch.save(net.state_dict(),data_path)
+        break
+      
   except KeyboardInterrupt:
     pass
   print("Finished training")
@@ -70,27 +103,18 @@ else:
 
 print("Accuracy checking")
 
-dataset: list[tuple[str,str]] = []
-
-# Load the dataset
-with open("testset.csv", newline="") as f:
-  creader = csv.reader(f, delimiter=",")
-  for row in creader:
-    dataset.append(row)
-
 total = 0
 correct = 0
 
-with torch.no_grad():
-  for data in dataset:
-    label, text = data
-    tlabel = torch.Tensor([CLASSES[label]], device=device)
-    in_array = tokenize(text)
-    np_array = np.array(in_array).astype(np.double)
-    tin = torch.from_numpy(np_array)
-    outputs = net(tin)
-    prediction = torch.round(outputs)
-    total += 1
-    correct += (1 if prediction == tlabel else 0)
-    if total % 500 == 0:
-      print(f"step {total}: {100 * correct / total:.2f}%")
+for data in testset:
+  label, text = data
+  tlabel = torch.Tensor([CLASSES[label]], device=device)
+  in_array = tokenize(text)
+  np_array = np.array(in_array).astype(np.double)
+  tin = torch.from_numpy(np_array)
+  outputs = net(tin)
+  prediction = torch.round(outputs)
+  total += 1
+  correct += (1 if prediction == tlabel else 0)
+
+print(f"Network Accuracy: {(correct / total)*100:.2f}%")
