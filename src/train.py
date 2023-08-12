@@ -86,9 +86,10 @@ if RETRAIN:
         np_array = np.array(in_array).astype(np.double)
         tin = torch.from_numpy(np_array).to(device)
         outputs = net(tin)
-        prediction = torch.round(outputs)
+        #print(outputs)
         total += 1
-        correct += (1 if prediction == tlabel else 0)
+        #print(outputs.argmax(0)==tlabel) #outputs.argmax(0),tlabel,
+        correct += (outputs.argmax(0) == tlabel).sum().item()
 
       print(f"epoch #{epoch} accuracy: {(correct / total)*100:.2f}%")
       if (correct / total) > 0.95:
@@ -116,8 +117,9 @@ for data in testset:
   np_array = np.array(in_array).astype(np.double)
   tin = torch.from_numpy(np_array).to(device)
   outputs = net(tin)
-  prediction = torch.round(outputs)
+  #print(outputs)
   total += 1
-  correct += (1 if prediction == tlabel else 0)
+  #print(outputs.argmax(0)==tlabel) #outputs.argmax(0),tlabel,
+  correct += (outputs.argmax(0) == tlabel).sum().item()
 
 print(f"Network Accuracy: {(correct / total)*100:.2f}%")
