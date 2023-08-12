@@ -9,7 +9,10 @@ CLASSES = ['empty', 'sadness', 'boredom', 'anger', 'relief', 'fun', 'surprise', 
 class Network(nn.Module):
   def __init__(self, *args, **kwargs) -> None:
     super().__init__(*args, **kwargs)
-    self.linear_relu_stack = nn.Sequential(                                                                                                               nn.Linear(40,30), # 40 input tokens, whittle it down to 13 neurons                                                                                  nn.ReLU(),                                                                                                                                          nn.Linear(30,25),
+    self.linear_relu_stack = nn.Sequential(
+      nn.Linear(40,30), # 40 input tokens, whittle it down to 13 neurons
+      nn.ReLU(),
+      nn.Linear(30,25),
       nn.ReLU(),
       nn.Linear(25,20),
       nn.ReLU(),
